@@ -23,7 +23,7 @@ The project analyzes air pollution change, land-cover transition, and population
 Download or clone the repository, then open:
 
 ```text
-index.html
+https://y39541231-meng.github.io/y39541231-meng-gis-lab5/
 ```
 
 in a web browser.
@@ -31,7 +31,7 @@ in a web browser.
 Or use the WebGIS link:
 
 ```text
-https://y39541231-meng.github.io/y39541231-meng-gis-lab5/
+https://y39541231-meng.github.io/y39541231-meng-gis-lab5/webgis.html
 ```
 
 ## Group work division
