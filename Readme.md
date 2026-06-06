@@ -31,7 +31,7 @@ in a web browser.
 Or use the WebGIS link:
 
 ```text
-xxx(还没写，之后加上)
+https://y39541231-meng.github.io/y39541231-meng-gis-lab5/
 ```
 
 ## Group work division
