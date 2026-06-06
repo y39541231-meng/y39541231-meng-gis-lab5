@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Methods | Mapping Air Quality in Italy</title>
+
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --navy: #12355b;
+      --blue: #2f80a8;
+      --blue-dark: #0b2f57;
+      --ink: #1f2933;
+      --muted: #52606d;
+      --bg: #eef3f7;
+      --card: #ffffff;
+      --line: #d9e2ec;
+      --soft: #e7f2f8;
+      --soft-2: #f7fafc;
+      --accent: #1f5f7a;
+      --shadow: 0 8px 26px rgba(15, 40, 70, 0.09);
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.6;
+    }
+
+    header {
+      background: #ffffff;
+      padding: 18px 8%;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.3px;
+    }
+
+    nav a {
+      margin-left: 22px;
+      color: var(--navy);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: #0077b6;
+    }
+
+    main {
+      width: min(1380px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 38px 0 70px;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, var(--navy), var(--blue));
+      color: #ffffff;
+      border-radius: 28px;
+      padding: clamp(36px, 5vw, 64px);
+      margin-bottom: 34px;
+      box-shadow: 0 12px 32px rgba(18, 53, 91, 0.22);
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 34px;
+      align-items: center;
+    }
+
+    .hero-card h1 {
+      margin: 0 0 18px;
+      color: #ffffff;
+      font-size: clamp(2.8rem, 5.2vw, 5.2rem);
+      line-height: 0.98;
+      letter-spacing: -2px;
+    }
+
+    .hero-card p {
+      max-width: 760px;
+      margin: 0;
+      color: #e9f3f8;
+      font-size: 1.12rem;
+    }
+
+    .hero-panel {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 24px;
+      padding: 24px;
+    }
+
+    .hero-panel-title {
+      margin: 0 0 14px;
+      color: #ffffff;
+      font-size: 1.1rem;
+      font-weight: 800;
+    }
+
+    .mini-flow {
+      display: grid;
+      gap: 10px;
+    }
+
+    .mini-flow-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .mini-box {
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--blue-dark);
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 800;
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
+    .mini-arrow {
+      color: #ffffff;
+      font-size: 1.5rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .section-card {
+      background: var(--card);
+      border-radius: 24px;
+      padding: 32px;
+      margin-bottom: 30px;
+      border: 1px solid #e4edf3;
+      box-shadow: var(--shadow);
+    }
+
+    .section-label {
+      display: inline-block;
+      padding: 6px 14px;
+      margin-bottom: 14px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+
+    h2, h3, h4 {
+      color: #102a43;
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: 2rem;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 1.35rem;
+    }
+
+    p.lead {
+      margin: 0 0 22px;
+      max-width: 940px;
+      color: var(--muted);
+      font-size: 1.02rem;
+    }
+
+    .workflow-map {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 22px;
+    }
+
+    .workflow-column {
+      border: 1px solid var(--line);
+      background: var(--soft-2);
+      border-radius: 18px;
+      padding: 20px;
+      min-height: 100%;
+    }
+
+    .workflow-column strong {
+      display: block;
+      color: var(--navy);
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .workflow-column ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .workflow-column li {
+      margin-bottom: 7px;
+    }
+
+    .big-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--blue);
+      font-size: 2.4rem;
+      font-weight: 900;
+    }
+
+    .step-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .step-pill {
+      background: var(--soft);
+      color: var(--navy);
+      border: 1px solid #c9ddea;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-weight: 800;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(15, 40, 70, 0.04);
+    }
+
+    .stage-header {
+      margin: 42px 0 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .stage-number {
+      flex: 0 0 auto;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--navy), var(--blue));
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 1.1rem;
+    }
+
+    .stage-header h2 {
+      margin: 0;
+    }
+
+    .stage-note {
+      margin: -6px 0 20px 60px;
+      color: var(--muted);
+    }
+
+    .step-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .step-card {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(15, 40, 70, 0.07);
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .step-card-header {
+      background: linear-gradient(135deg, #f3f9fc, #e7f2f8);
+      border-bottom: 1px solid var(--line);
+      padding: 18px 22px;
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 110px;
+      height: 46px;
+      border-radius: 999px;
+      background: var(--navy);
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 0.98rem;
+      white-space: nowrap;
+    }
+
+    .step-card-header h3 {
+      line-height: 1.25;
+    }
+
+    .method-flow {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      gap: 10px;
+      align-items: stretch;
+      padding: 18px 20px 0;
+    }
+
+    .method-cell {
+      background: var(--soft-2);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .method-cell span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .method-cell p {
+      margin: 0;
+      color: #263947;
+      font-size: 0.95rem;
+    }
+
+    .flow-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--blue);
+      font-weight: 900;
+      font-size: 1.6rem;
+    }
+
+    .step-details {
+      padding: 16px 20px 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .detail-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .detail-label {
+      color: var(--navy);
+      font-weight: 900;
+    }
+
+    .detail-value {
+      color: #34495a;
+    }
+
+    code {
+      background: #edf3f8;
+      border: 1px solid #d9e2ec;
+      border-radius: 8px;
+      padding: 2px 7px;
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      font-size: 0.92em;
+      color: #12355b;
+      white-space: nowrap;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 2px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #eef7fb;
+      color: var(--accent);
+      border: 1px solid #cfe3ee;
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+
+    .challenge-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .challenge-card {
+      border: 1px solid var(--line);
+      background: var(--soft-2);
+      border-radius: 18px;
+      padding: 20px;
+    }
+
+    .challenge-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--navy);
+      font-size: 1.02rem;
+    }
+
+    .challenge-card p {
+      margin: 0;
+      color: #34495a;
+    }
+
+    .processing-challenge-module {
+      margin-top: 34px;
+      padding-top: 34px;
+      border-top: 1px solid var(--line);
+    }
+
+    .processing-challenge-module h2 {
+      margin-bottom: 14px;
+    }
+
+    .challenge-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 24px;
+    }
+
+    .challenge-summary-card {
+      position: relative;
+      border: 1px solid #cfe3ee;
+      background: linear-gradient(135deg, #f7fbfe, #eef7fb);
+      border-radius: 18px;
+      padding: 22px 22px 24px;
+      min-height: 100%;
+    }
+
+    .challenge-summary-card .step-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      margin-bottom: 12px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: #ffffff;
+      font-weight: 900;
+      font-size: 0.84rem;
+    }
+
+    .challenge-summary-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--navy);
+      font-size: 1.02rem;
+    }
+
+    .challenge-summary-card p {
+      margin: 0;
+      color: #34495a;
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 13px 22px;
+      border-radius: 999px;
+      font-weight: 800;
+      text-decoration: none;
+      color: #ffffff;
+      background: var(--navy);
+      border: 1px solid var(--navy);
+    }
+
+    .button.secondary {
+      background: #ffffff;
+      color: var(--navy);
+      border-color: #b8d1df;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      background: #ffffff;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1120px) {
+      .hero-card,
+      .workflow-map,
+      .step-grid,
+      .challenge-grid,
+      .challenge-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .big-arrow {
+        transform: rotate(90deg);
+      }
+
+      .method-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+
+      .step-strip {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      nav a {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+
+      main {
+        width: calc(100% - 24px);
+        padding-top: 24px;
+      }
+
+      .hero-card,
+      .section-card {
+        padding: 24px 18px;
+        border-radius: 20px;
+      }
+
+      .hero-card h1 {
+        font-size: 3rem;
+        letter-spacing: -1px;
+      }
+
+      .mini-flow-row {
+        grid-template-columns: 1fr;
+      }
+
+      .mini-arrow {
+        transform: rotate(90deg);
+        justify-self: center;
+      }
+
+      .step-strip {
+        grid-template-columns: 1fr;
+      }
+
+      .stage-note {
+        margin-left: 0;
+      }
+
+      .stage-header {
+        align-items: flex-start;
+      }
+
+      .detail-row {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+
+      code {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">GIS Lab 2025/26</div>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a class="active" href="methods.html">Methods</a>
+      <a href="results.html">Results</a>
+      <a href="webgis.html">WebGIS</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero-card">
+      <div>
+        <h1>Methods</h1>
+        <p>
+          The methodology follows the laboratory processing sequence from pollutant preparation to land-cover transition analysis, zonal statistics, bivariate mapping, and population exposure charts. The page summarizes the workflow with compact processing cards.
+        </p>
+      </div>
+
+      <aside class="hero-panel" aria-label="Main workflow summary">
+        <p class="hero-panel-title">Main logic</p>
+        <div class="mini-flow">
+          <div class="mini-flow-row">
+            <div class="mini-box">Air quality data</div>
+            <div class="mini-arrow">→</div>
+            <div class="mini-box">Annual change maps</div>
+          </div>
+          <div class="mini-flow-row">
+            <div class="mini-box">Land-cover data</div>
+            <div class="mini-arrow">→</div>
+            <div class="mini-box">Stable / gain / loss zones</div>
+          </div>
+          <div class="mini-flow-row">
+            <div class="mini-box">Population data</div>
+            <div class="mini-arrow">→</div>
+            <div class="mini-box">Exposure visualization</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section-card">
+      <span class="section-label">Workflow overview</span>
+      <h2>Processing chain</h2>
+      <p class="lead">
+        The common preprocessing stage placed all datasets in the same spatial framework and clipped them to the Italy case-study boundary. The numbered steps below follow the laboratory deliverables.
+      </p>
+
+      <div class="workflow-map">
+        <div class="workflow-column">
+          <strong>Input data</strong>
+          <ul>
+            <li>CAMS pollutant data</li>
+            <li>ESRI 10m Annual Land Cover</li>
+            <li>WorldPop population count</li>
+            <li>Boundary and GAUL Level 2 zones</li>
+          </ul>
+        </div>
+        <div class="big-arrow">→</div>
+        <div class="workflow-column">
+          <strong>GIS processing</strong>
+          <ul>
+            <li>Clip, aggregate, reclassify</li>
+            <li>AMAC calculation</li>
+            <li>Land-cover transition coding</li>
+            <li>Zonal statistics and dissolve</li>
+          </ul>
+        </div>
+        <div class="big-arrow">→</div>
+        <div class="workflow-column">
+          <strong>Website outputs</strong>
+          <ul>
+            <li>Transition statistics table</li>
+            <li>Mean / min / max bar charts</li>
+            <li>Bivariate exposure maps</li>
+            <li>Population exposure pie charts</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step-strip" aria-label="Laboratory steps from 1 to 8">
+        <div class="step-pill">1 · Pollutant maps</div>
+        <div class="step-pill">2 · Annual averages</div>
+        <div class="step-pill">3 · Concentration classes</div>
+        <div class="step-pill">4 · Pollutant change map</div>
+        <div class="step-pill">5 · Land-cover change</div>
+        <div class="step-pill">6 · Zonal statistics</div>
+        <div class="step-pill">7 · Bivariate maps</div>
+        <div class="step-pill">8 · Exposure charts</div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <div class="stage-header">
+        <span class="stage-number">A</span>
+        <h2>Air-quality processing</h2>
+      </div>
+      <p class="stage-note">Steps 1–4 prepare the pollutant rasters and derive the annual mean aggregation change between 2021 and 2023.</p>
+
+      <div class="step-grid">
+        <article class="step-card">
+          <div class="step-card-header">
+            <span class="step-badge">Step 1</span>
+            <h3>December 2023 pollutant maps</h3>
+          </div>
+
+          <div class="method-flow">
+            <div class="method-cell">
+              <span>Input</span>
+              <p>CAMS December 2023 NetCDF</p>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell">
+              <span>Operation</span>
+              <p>Mesh Calculator and raster export</p>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell">
+              <span>Output</span>
+              <p>December pollutant GeoTIFFs</p>
+            </div>
+          </div>
+
+          <div class="step-details">
+            <div class="detail-row"><div class="detail-label">Parameters</div><div class="detail-value">Ensemble median, level 0, validated reanalysis, December 2023.</div></div>
+            <div class="detail-row"><div class="detail-label">Files</div><div class="detail-value"><code>COUNTRY_CAMS_no2_2023_12.tif</code>, <code>COUNTRY_CAMS_pm2p5_2023_12.tif</code>, <code>COUNTRY_CAMS_pm10_2023_12.tif</code></div></div>
+            <div class="detail-row"><div class="detail-label">Tools</div><div class="detail-value"><span class="tag-row"><span class="tag">QGIS</span><span class="tag">Mesh Calculator</span><span class="tag">Rasterize mesh</span></span></div></div>
+          </div>
+        </article>
+
+        <article class="step-card">
+          <div class="step-card-header">
+            <span class="step-badge">Step 2</span>
+            <h3>Annual average pollutant maps</h3>
+          </div>
+
+          <div class="method-flow">
+            <div class="method-cell"><span>Input</span><p>Monthly pollutant rasters</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Operation</span><p>Average aggregation</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Output</span><p>2023 annual average maps</p></div>
+          </div>
+
+          <div class="step-details">
+            <div class="detail-row"><div class="detail-label">Parameters</div><div class="detail-value">Aggregation operation = average; clipped rasters used as input.</div></div>
+            <div class="detail-row"><div class="detail-label">Files</div><div class="detail-value"><code>COUNTRY_average_no2_2023.tif</code>, <code>COUNTRY_average_pm2p5_2023.tif</code>, <code>COUNTRY_average_pm10_2023.tif</code></div></div>
+            <div class="detail-row"><div class="detail-label">Tools</div><div class="detail-value"><span class="tag-row"><span class="tag">GRASS GIS</span><span class="tag">r.series</span><span class="tag">Batch process</span></span></div></div>
+          </div>
+        </article>
+
+        <article class="step-card">
+          <div class="step-card-header">
+            <span class="step-badge">Step 3</span>
+            <h3>Concentration class maps</h3>
+          </div>
+
+          <div class="method-flow">
+            <div class="method-cell"><span>Input</span><p>Annual average maps</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Operation</span><p>Reclassify into 5 classes</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Output</span><p>Pollutant class rasters</p></div>
+          </div>
+
+          <div class="step-details">
+            <div class="detail-row"><div class="detail-label">Parameters</div><div class="detail-value">EU concentration thresholds for NO2, PM2.5, and PM10; five-class output.</div></div>
+            <div class="detail-row"><div class="detail-label">Files</div><div class="detail-value"><code>COUNTRY_no2_concentration_map_2023.tif</code>, <code>COUNTRY_pm2p5_concentration_map_2023.tif</code>, <code>COUNTRY_pm10_concentration_map_2023.tif</code></div></div>
+            <div class="detail-row"><div class="detail-label">Tools</div><div class="detail-value"><span class="tag-row"><span class="tag">QGIS</span><span class="tag">Reclassify by table</span></span></div></div>
+          </div>
+        </article>
+
+        <article class="step-card">
+          <div class="step-card-header">
+            <span class="step-badge">Step 4</span>
+            <h3>Annual Mean Aggregation Change</h3>
+          </div>
+
+          <div class="method-flow">
+            <div class="method-cell"><span>Input</span><p>2021 and 2023 annual averages</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Operation</span><p><code>2023 - 2021</code></p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Output</span><p>AMAC raster + QML style</p></div>
+          </div>
+
+          <div class="step-details">
+            <div class="detail-row"><div class="detail-label">Expression</div><div class="detail-value"><code>POLLUTANT_2023 - POLLUTANT_2021</code></div></div>
+            <div class="detail-row"><div class="detail-label">Files</div><div class="detail-value"><code>COUNTRY_POLLUTANT_2021_2023_AMAC_map.tif</code> and <code>.qml</code></div></div>
+            <div class="detail-row"><div class="detail-label">Tools</div><div class="detail-value"><span class="tag-row"><span class="tag">Raster Calculator</span><span class="tag">Discrete symbology</span></span></div></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <div class="stage-header">
+        <span class="stage-number">B</span>
+        <h2>Land-cover transition and pollutant correlation</h2>
+      </div>
+      <p class="stage-note">Steps 5–6 connect 2021–2023 land-cover transitions with pollutant change using stable, gain, and loss zones.</p>
+
+      <div class="step-grid">
+        <article class="step-card">
+          <div class="step-card-header">
+            <span class="step-badge">Step 5</span>
+            <h3>Land-cover change map and statistics</h3>
+          </div>
+
+          <div class="method-flow">
+            <div class="method-cell"><span>Input</span><p>ESRI Land Cover 2021 and 2023</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Operation</span><p>Unique transition code</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Output</span><p>LCC map + statistics table</p></div>
+          </div>
+
+          <div class="step-details">
+            <div class="detail-row"><div class="detail-label">Expression</div><div class="detail-value"><code>LC_2021 * 100 + LC_2023</code></div></div>
+            <div class="detail-row"><div class="detail-label">Statistics</div><div class="detail-value">Stable pixels, top 3 sources of gain, and top 3 destinations of loss for the assigned class.</div></div>
+            <div class="detail-row"><div class="detail-label">Files</div><div class="detail-value"><code>COUNTRY_LCC_2021_2023.tif</code></div></div>
+            <div class="detail-row"><div class="detail-label">Rule</div><div class="detail-value">Transitions involving Cloud class 10 were treated as NoData.</div></div>
+          </div>
+        </article>
+
+        <article class="step-card">
+          <div class="step-card-header">
+            <span class="step-badge">Step 6</span>
+            <h3>Zonal statistics by transition zone</h3>
+          </div>
+
+          <div class="method-flow">
+            <div class="method-cell"><span>Input</span><p>Binary change mask + AMAC</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Operation</span><p>Polygonize, dissolve, statistics</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Output</span><p>Mean / min / max table and bar chart</p></div>
+          </div>
+
+          <div class="step-details">
+            <div class="detail-row"><div class="detail-label">Zones</div><div class="detail-value"><code>1</code> stable, <code>2</code> gain, <code>3</code> loss, <code>-1</code> NoData.</div></div>
+            <div class="detail-row"><div class="detail-label">Statistics</div><div class="detail-value">Mean, minimum, and maximum pollutant AMAC values for each zone.</div></div>
+            <div class="detail-row"><div class="detail-label">Files</div><div class="detail-value"><code>COUNTRY_POLLUTANT_zonal_statistics_2021_2023.gpkg</code></div></div>
+            <div class="detail-row"><div class="detail-label">Tools</div><div class="detail-value"><span class="tag-row"><span class="tag">GDAL Raster Calculator</span><span class="tag">Polygonize</span><span class="tag">Dissolve</span><span class="tag">Zonal Statistics</span></span></div></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <div class="stage-header">
+        <span class="stage-number">C</span>
+        <h2>Population exposure and bivariate visualization</h2>
+      </div>
+      <p class="stage-note">Steps 7–8 combine 2023 population classes and pollutant concentration classes to visualize exposure patterns.</p>
+
+      <div class="step-grid">
+        <article class="step-card">
+          <div class="step-card-header">
+            <span class="step-badge">Step 7</span>
+            <h3>Bivariate maps</h3>
+          </div>
+
+          <div class="method-flow">
+            <div class="method-cell"><span>Input</span><p>GAUL L2, population classes, pollutant classes</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Operation</span><p>Class combination</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Output</span><p>5×5 bivariate map</p></div>
+          </div>
+
+          <div class="step-details">
+            <div class="detail-row"><div class="detail-label">Expression</div><div class="detail-value"><code>pol_class_max * 10 + pop_class_median</code></div></div>
+            <div class="detail-row"><div class="detail-label">Statistics</div><div class="detail-value">Population class = median; pollutant class = maximum by administrative zone.</div></div>
+            <div class="detail-row"><div class="detail-label">Files</div><div class="detail-value"><code>COUNTRY_POLLUTANT_2023_bivariate.gpkg</code></div></div>
+            <div class="detail-row"><div class="detail-label">Tools</div><div class="detail-value"><span class="tag-row"><span class="tag">GAUL Level 2</span><span class="tag">Zonal Statistics</span><span class="tag">Field Calculator</span><span class="tag">5×5 QML style</span></span></div></div>
+          </div>
+        </article>
+
+        <article class="step-card">
+          <div class="step-card-header">
+            <span class="step-badge">Step 8</span>
+            <h3>Population exposure pie charts</h3>
+          </div>
+
+          <div class="method-flow">
+            <div class="method-cell"><span>Input</span><p>Bivariate layer + unquantized population raster</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Operation</span><p>Dissolve and population sum</p></div>
+            <div class="flow-arrow">→</div>
+            <div class="method-cell"><span>Output</span><p>Exposure chart by pollutant class</p></div>
+          </div>
+
+          <div class="step-details">
+            <div class="detail-row"><div class="detail-label">Dissolve field</div><div class="detail-value"><code>pol_class_max</code></div></div>
+            <div class="detail-row"><div class="detail-label">Statistic</div><div class="detail-value">Population sum from the original WorldPop population count raster.</div></div>
+            <div class="detail-row"><div class="detail-label">Files</div><div class="detail-value"><code>COUNTRY_POLLUTANT_2023_chart.gpkg</code> and exported pie chart image.</div></div>
+            <div class="detail-row"><div class="detail-label">Tools</div><div class="detail-value"><span class="tag-row"><span class="tag">Dissolve</span><span class="tag">Zonal Statistics</span><span class="tag">Chart plotting</span></span></div></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <span class="section-label">Processing choices and challenges</span>
+      <h2>Key decisions</h2>
+      <p class="lead">
+        The following choices were made to keep the workflow reproducible, reduce processing load, and make the outputs suitable for website presentation.
+      </p>
+
+      <div class="challenge-grid">
+        <div class="challenge-card">
+          <strong>Large raster size</strong>
+          <p>Layers were clipped to the Italy case-study boundary and saved as GeoTIFF or GeoPackage outputs.</p>
+        </div>
+
+        <div class="challenge-card">
+          <strong>Resolution mismatch</strong>
+          <p>CAMS pollutant rasters and ESRI land-cover rasters had different spatial resolutions, so resampling was required before zonal statistics.</p>
+        </div>
+
+        <div class="challenge-card">
+          <strong>NoData handling</strong>
+          <p>NoData values were preserved outside the area of interest and controlled during reclassification and masking.</p>
+        </div>
+
+        <div class="challenge-card">
+          <strong>Cloud transitions</strong>
+          <p>Land-cover transitions involving class 10, Clouds, were excluded from stable, gain, and loss statistics.</p>
+        </div>
+
+        <div class="challenge-card">
+          <strong>Heavy vector layers</strong>
+          <p>Polygonized masks were dissolved by transition zone or pollutant class to reduce feature count before computing statistics.</p>
+        </div>
+
+        <div class="challenge-card">
+          <strong>Chart production</strong>
+          <p>Pie charts were inserted as exported figures, allowing the website to show exposure results even when plotting plugins were unavailable.</p>
+        </div>
+      </div>
+
+      <div class="processing-challenge-module">
+        <h2>Main processing challenge</h2>
+        <p class="lead">
+          The most demanding part of the workflow was the high-resolution land-cover processing, especially after converting raster masks into vector features.
+        </p>
+
+        <div class="challenge-summary">
+          <div class="challenge-summary-card">
+            <span class="step-index">01</span>
+            <strong>Large land-cover files</strong>
+            <p>The ESRI 10 m land-cover datasets produced very large intermediate raster files, often reaching tens of GB.</p>
+          </div>
+
+          <div class="challenge-summary-card">
+            <span class="step-index">02</span>
+            <strong>Millions of vector features</strong>
+            <p>After polygonizing the land-cover change mask, the attribute table contained around 6–7 million features.</p>
+          </div>
+
+          <div class="challenge-summary-card">
+            <span class="step-index">03</span>
+            <strong>Slow dissolve operation</strong>
+            <p>The dissolve step became the main bottleneck, and some group processing tasks required more than ten hours to complete.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Geographic Information Systems A.A. 2025/26 | Mapping Air Quality in Italy | Group 6
+  </footer>
+</body>
+</html>

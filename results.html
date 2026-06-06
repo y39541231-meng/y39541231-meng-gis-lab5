@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Results | Mapping Air Quality in Italy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #1f2933;
+      background: #eef3f7;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #ffffff;
+      padding: 18px 8%;
+      border-bottom: 1px solid #d9e2ec;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-weight: bold;
+      color: #12355b;
+      letter-spacing: 0.3px;
+    }
+
+    nav a {
+      margin-left: 22px;
+      color: #12355b;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    nav a:hover {
+      color: #0077b6;
+    }
+
+    main {
+      max-width: 1250px;
+      margin: 0 auto;
+      padding: 42px 24px 60px;
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, #12355b, #2f80a8);
+      color: white;
+      border-radius: 22px;
+      padding: 48px 44px;
+      margin-bottom: 38px;
+      box-shadow: 0 8px 28px rgba(18, 53, 91, 0.22);
+    }
+
+    .hero-card h1 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      font-size: 2.5rem;
+      color: white;
+    }
+
+    .hero-card p {
+      max-width: 900px;
+      font-size: 1.05rem;
+      color: #e9f3f8;
+    }
+
+    .result-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 34px;
+      margin-bottom: 34px;
+      box-shadow: 0 6px 22px rgba(15, 40, 70, 0.09);
+      border: 1px solid #e4edf3;
+    }
+
+    .section-label {
+      display: inline-block;
+      padding: 5px 12px;
+      margin-bottom: 12px;
+      border-radius: 999px;
+      background: #e7f2f8;
+      color: #1f5f7a;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    h1, h2, h3 {
+      color: #102a43;
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 1.8rem;
+    }
+
+    h3 {
+      margin-top: 34px;
+      margin-bottom: 12px;
+      color: #1f3a5f;
+    }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 18px;
+      margin-bottom: 18px;
+      background: #ffffff;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .summary-table th,
+    .summary-table td {
+      border: 1px solid #d9e2ec;
+      padding: 13px 14px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    .summary-table th {
+      background: #12355b;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .summary-table tr:nth-child(even) {
+      background: #f7fafc;
+    }
+
+    .summary-table td:nth-child(2) {
+      font-weight: 700;
+      color: #1f5f7a;
+      white-space: nowrap;
+    }
+
+    .note {
+      font-size: 0.92rem;
+      color: #52606d;
+      background: #f4f8fb;
+      border-left: 4px solid #2f80a8;
+      padding: 12px 14px;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+
+    figure {
+      margin: 24px 0;
+    }
+
+    figure img {
+      width: 100%;
+      height: auto;
+      border: 1px solid #d9e2ec;
+      border-radius: 14px;
+      background: #ffffff;
+      box-shadow: 0 4px 14px rgba(15, 40, 70, 0.08);
+    }
+
+    figcaption {
+      margin-top: 10px;
+      font-size: 0.92rem;
+      color: #52606d;
+      text-align: center;
+    }
+
+    .wide-figure {
+      max-width: 1080px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .wide-figure img {
+      width: 100%;
+      max-height: none;
+      object-fit: contain;
+    }
+
+    .exposure-grid {
+      display: grid;
+      grid-template-columns: 1.6fr 0.9fr;
+      gap: 26px;
+      align-items: stretch;
+      margin-top: 20px;
+    }
+
+    .exposure-card {
+      background: #ffffff;
+      border: 1px solid #d9e2ec;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 14px rgba(15, 40, 70, 0.08);
+    }
+
+    .map-legend-card {
+      display: grid;
+      grid-template-columns: 0.22fr 1fr;
+      grid-template-rows: 1fr auto;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .map-legend-card figure {
+      margin: 0;
+    }
+
+    .legend-small {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: end;
+      justify-self: center;
+      margin-bottom: 38px;
+    }
+
+    .legend-small img {
+      width: 100%;
+      max-height: 210px;
+      object-fit: contain;
+      border: none;
+      box-shadow: none;
+      border-radius: 8px;
+      background: #ffffff;
+    }
+
+    .map-large {
+      grid-column: 2;
+      grid-row: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .map-large img {
+      width: 100%;
+      height: 540px;
+      object-fit: contain;
+      border: none;
+      box-shadow: none;
+      border-radius: 10px;
+      background: #ffffff;
+    }
+
+    .pie-card {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pie-card figure {
+      margin: 0;
+      width: 100%;
+    }
+
+    .pie-card img {
+      width: 100%;
+      height: 540px;
+      object-fit: contain;
+      border: none;
+      box-shadow: none;
+      border-radius: 10px;
+      background: #ffffff;
+    }
+
+    .map-caption {
+      grid-column: 1 / 3;
+      grid-row: 2;
+      margin-top: 8px;
+      font-size: 0.92rem;
+      color: #52606d;
+      text-align: center;
+    }
+
+    .interpretation-box {
+      background: #f7fafc;
+      border-radius: 14px;
+      padding: 22px 24px;
+      border: 1px solid #d9e2ec;
+    }
+
+    .interpretation-box p {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      background: white;
+      border-top: 1px solid #d9e2ec;
+      color: #52606d;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1000px) {
+      .exposure-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      nav a {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+
+      main {
+        padding: 28px 14px;
+      }
+
+      .hero-card {
+        padding: 32px 24px;
+      }
+
+      .hero-card h1 {
+        font-size: 2rem;
+      }
+
+      .result-card {
+        padding: 24px 18px;
+      }
+
+      .summary-table {
+        font-size: 0.9rem;
+      }
+
+      .map-legend-card {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto;
+      }
+
+      .map-large {
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .legend-small {
+        grid-column: 1;
+        grid-row: 2;
+        align-self: center;
+        justify-self: center;
+        max-width: 240px;
+        margin: 10px auto;
+      }
+
+      .map-caption {
+        grid-column: 1;
+        grid-row: 3;
+      }
+
+      .map-large img,
+      .pie-card img {
+        height: auto;
+      }
+
+      .legend-small img {
+        max-height: 240px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">GIS Lab 2025/26</div>
+
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="methods.html">Methods</a>
+      <a href="results.html">Results</a>
+      <a href="webgis.html">WebGIS</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero-card">
+      <h1>Results</h1>
+
+      <p>
+        This page presents the main outputs of the GIS laboratory, including land-cover
+        transition statistics, pollutant concentration changes, bivariate exposure maps,
+        and population exposure charts.
+      </p>
+
+      <p>
+        The results are organized by the assigned pollutant and land-cover class:
+        NO2 with Built Area, PM10 with Trees, and PM2.5 with Crops.
+      </p>
+    </section>
+
+    <section class="result-card" id="no2-built-area">
+      <span class="section-label">NO2 · Built Area · Mengyuan Lei</span>
+      <h2>NO2 and Built Area Land-Cover Transition</h2>
+
+      <p>
+        This section analyzes the relationship between NO2 annual mean aggregation change
+        and built area land-cover transitions in Italy between 2021 and 2023.
+      </p>
+
+      <h3>Land-Cover Transition Statistics: Built Area</h3>
+
+      <p>
+        The table below summarizes the pixel-based land-cover transition statistics for Built Area.
+        Transitions involving Clouds were excluded from the analysis.
+      </p>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Indicator</th>
+            <th>Pixel percentage (%)</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Stability / Persistence</td>
+            <td>94.62</td>
+            <td>Built Area remained Built Area</td>
+          </tr>
+          <tr>
+            <td>Primary Source of Gain</td>
+            <td>55.54</td>
+            <td>Crops → Built Area</td>
+          </tr>
+          <tr>
+            <td>Secondary Source of Gain</td>
+            <td>25.08</td>
+            <td>Rangeland → Built Area</td>
+          </tr>
+          <tr>
+            <td>Third Source of Gain</td>
+            <td>15.42</td>
+            <td>Trees → Built Area</td>
+          </tr>
+          <tr>
+            <td>Primary Destination of Loss</td>
+            <td>48.26</td>
+            <td>Built Area → Crops</td>
+          </tr>
+          <tr>
+            <td>Secondary Destination of Loss</td>
+            <td>24.46</td>
+            <td>Built Area → Trees</td>
+          </tr>
+          <tr>
+            <td>Third Destination of Loss</td>
+            <td>24.07</td>
+            <td>Built Area → Rangeland</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="note">
+        Percentages are pixel-based. Stability is calculated relative to stable and loss pixels,
+        while gain and loss percentages are calculated relative to total valid gain and total valid loss respectively.
+      </p>
+
+      <h3>NO2 Change by Built Area Transition Zones</h3>
+
+      <figure class="wide-figure">
+        <img src="images/results/no2_built_bar_chart.png" alt="NO2 change by built area land-cover transition zones" />
+        <figcaption>
+          Figure 1. NO2 annual mean aggregation change by built area transition zones in Italy, 2021–2023.
+        </figcaption>
+      </figure>
+
+      <h3>Population Exposure to NO2</h3>
+
+      <div class="exposure-grid">
+        <div class="exposure-card map-legend-card">
+          <figure class="legend-small">
+            <img src="images/results/bivariate_legend_5x5.png" alt="5 by 5 bivariate legend" />
+          </figure>
+
+          <figure class="map-large">
+            <img src="images/results/NO2_bivariate_map.png" alt="NO2 and population exposure bivariate map" />
+          </figure>
+
+          <div class="map-caption">
+            Figure 2. NO2 bivariate exposure map with the common 5×5 legend for pollutant concentration and population count.
+          </div>
+        </div>
+
+        <div class="exposure-card pie-card">
+          <figure>
+            <img src="images/results/no2_population_exposure_pie.png" alt="Population exposure to NO2 concentration classes" />
+            <figcaption>
+              Figure 3. Population exposure to different NO2 concentration classes.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <h3>Interpretation</h3>
+
+      <div class="interpretation-box">
+        <p>
+          Built area shows high persistence between 2021 and 2023, with 94.62% of built-up pixels remaining stable.
+          Most newly urbanized areas originated from Crops, followed by Rangeland and Trees. The NO2 zonal statistics
+          indicate negative mean changes for stable, gain, and loss built area zones, suggesting an overall decrease
+          in NO2 concentration during the study period. However, positive maximum values show that localized NO2
+          increases still occurred in some areas.
+        </p>
+      </div>
+    </section>
+
+    <section class="result-card" id="pm10-trees">
+      <span class="section-label">PM10 · Trees · Mengzhen Han</span>
+      <h2>PM10 and Trees Land-Cover Transition</h2>
+
+      <p>
+        This section analyzes the relationship between PM10 annual mean aggregation change
+        and tree land-cover transitions in Italy between 2021 and 2023. Tree-related pixels
+        were classified into stable trees, trees gain, and trees loss.
+      </p>
+
+      <h3>Land-Cover Transition Statistics: Trees</h3>
+
+      <p>
+        The table below summarizes the pixel-based land-cover transition statistics for Trees.
+        Transitions involving Clouds were excluded from the analysis.
+      </p>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Indicator</th>
+            <th>Pixel percentage (%)</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Stability / Persistence</td>
+            <td>93.58</td>
+            <td>Trees remained Trees</td>
+          </tr>
+          <tr>
+            <td>Primary Source of Gain</td>
+            <td>70.43</td>
+            <td>Rangeland → Trees</td>
+          </tr>
+          <tr>
+            <td>Secondary Source of Gain</td>
+            <td>22.02</td>
+            <td>Crops → Trees</td>
+          </tr>
+          <tr>
+            <td>Third Source of Gain</td>
+            <td>6.18</td>
+            <td>Built Area → Trees</td>
+          </tr>
+          <tr>
+            <td>Primary Destination of Loss</td>
+            <td>82.08</td>
+            <td>Trees → Rangeland</td>
+          </tr>
+          <tr>
+            <td>Secondary Destination of Loss</td>
+            <td>9.39</td>
+            <td>Trees → Crops</td>
+          </tr>
+          <tr>
+            <td>Third Destination of Loss</td>
+            <td>7.96</td>
+            <td>Trees → Built Area</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="note">
+        Percentages are pixel-based. Stability is calculated relative to stable and loss pixels,
+        while gain and loss percentages are calculated relative to total valid gain and total valid loss respectively.
+      </p>
+
+      <h3>PM10 Change by Tree Transition Zones</h3>
+
+      <figure class="wide-figure">
+        <img src="images/results/pm10_trees_bar_chart.png" alt="PM10 change by tree land-cover transition zones" />
+        <figcaption>
+          Figure 4. PM10 annual mean aggregation change by tree land-cover transition zones in Italy, 2021–2023.
+        </figcaption>
+      </figure>
+
+      <h3>Population Exposure to PM10</h3>
+
+      <div class="exposure-grid">
+        <div class="exposure-card map-legend-card">
+          <figure class="legend-small">
+            <img src="images/results/bivariate_legend_5x5.png" alt="5 by 5 bivariate legend" />
+          </figure>
+
+          <figure class="map-large">
+            <img src="images/results/PM10_bivariate_map.png" alt="PM10 and population exposure bivariate map" />
+          </figure>
+
+          <div class="map-caption">
+            Figure 5. PM10 bivariate exposure map with the common 5×5 legend for pollutant concentration and population count.
+          </div>
+        </div>
+
+        <div class="exposure-card pie-card">
+          <figure>
+            <img src="images/results/pm10_population_exposure_pie.png" alt="Population exposure to PM10 concentration classes" />
+            <figcaption>
+              Figure 6. Population exposure to different PM10 concentration classes.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <h3>Interpretation</h3>
+
+      <div class="interpretation-box">
+        <p>
+          For PM10, all tree-related transition zones show a negative mean annual aggregation change between 2021 and 2023.
+          This indicates an overall decrease in PM10 concentration within stable tree areas, tree gain areas, and tree loss areas.
+          The strongest average decrease is observed in tree loss zones, while tree gain zones show a smaller decrease.
+          However, the maximum values are positive in all three zones, suggesting that localized PM10 increases still occur.
+          Therefore, the relationship between tree-cover transition and PM10 change should be interpreted as a spatial association
+          rather than a direct causal effect.
+        </p>
+      </div>
+    </section>
+
+    <section class="result-card" id="pm2p5-crops">
+      <span class="section-label">PM2.5 · Crops · Yueling Tian</span>
+      <h2>PM2.5 and Crops Land-Cover Transition</h2>
+
+      <p>
+        This section analyzes the relationship between PM2.5 annual mean aggregation change
+        and crop land-cover transitions in Italy between 2021 and 2023.
+      </p>
+
+      <h3>Land-Cover Transition Statistics: Crops</h3>
+
+      <p>
+        The table below summarizes the pixel-based land-cover transition statistics for Crops.
+        Transitions involving Clouds were excluded from the analysis.
+      </p>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Indicator</th>
+            <th>Pixel percentage (%)</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>Stability / Persistence</td>
+            <td>93.20</td>
+            <td>Crops remained Crops</td>
+          </tr>
+          <tr>
+            <td>Primary Source of Gain</td>
+            <td>60.70</td>
+            <td>Rangeland → Crops</td>
+          </tr>
+          <tr>
+            <td>Secondary Source of Gain</td>
+            <td>22.50</td>
+            <td>Built Area → Crops</td>
+          </tr>
+          <tr>
+            <td>Third Source of Gain</td>
+            <td>15.10</td>
+            <td>Trees → Crops</td>
+          </tr>
+          <tr>
+            <td>Primary Destination of Loss</td>
+            <td>50.40</td>
+            <td>Crops → Rangeland</td>
+          </tr>
+          <tr>
+            <td>Secondary Destination of Loss</td>
+            <td>26.00</td>
+            <td>Crops → Built Area</td>
+          </tr>
+          <tr>
+            <td>Third Destination of Loss</td>
+            <td>22.80</td>
+            <td>Crops → Trees</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="note">
+        Percentages are pixel-based. Stability is calculated relative to stable and loss pixels,
+        while gain and loss percentages are calculated relative to total valid gain and total valid loss respectively.
+      </p>
+
+      <h3>PM2.5 Change by Crop Transition Zones</h3>
+
+      <figure class="wide-figure">
+        <img src="images/results/pm2p5_crops_bar_chart.png" alt="PM2.5 change by crop land-cover transition zones" />
+        <figcaption>
+          Figure 7. PM2.5 annual mean aggregation change by crop land-cover transition zones in Italy, 2021–2023.
+        </figcaption>
+      </figure>
+
+      <h3>Population Exposure to PM2.5</h3>
+
+      <div class="exposure-grid">
+        <div class="exposure-card map-legend-card">
+          <figure class="legend-small">
+            <img src="images/results/bivariate_legend_5x5.png" alt="5 by 5 bivariate legend" />
+          </figure>
+
+          <figure class="map-large">
+            <img src="images/results/PM2.5_bivariate_map.png" alt="PM2.5 and population exposure bivariate map" />
+          </figure>
+
+          <div class="map-caption">
+            Figure 8. PM2.5 bivariate exposure map with the common 5×5 legend for pollutant concentration and population count.
+          </div>
+        </div>
+
+        <div class="exposure-card pie-card">
+          <figure>
+            <img src="images/results/pm2.5_population_exposure_pie.png" alt="Population exposure to PM2.5 concentration classes" />
+            <figcaption>
+              Figure 9. Population exposure to different PM2.5 concentration classes.
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <h3>Interpretation</h3>
+
+      <div class="interpretation-box">
+        <p>
+          For PM2.5, all crop-related transition zones show negative mean annual mean aggregation change between 2021 and 2023.
+          The smallest average decrease is observed in stable crop areas, while crop gain and crop loss areas show stronger decreases.
+          The positive maximum value indicates that some local areas still experienced an increase in PM2.5 concentration.
+          Therefore, the relationship between crop transition and PM2.5 change should be interpreted as a spatial pattern rather than
+          a direct causal relationship.
+        </p>
+      </div>
+    </section>
+
+    <section class="result-card" id="comparative-summary">
+      <span class="section-label">Comparative summary</span>
+      <h2>Comparison of Pollutant Change Patterns</h2>
+
+      <p>
+        The table below summarizes the mean annual aggregation change for each pollutant and its assigned land-cover transition class.
+      </p>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Pollutant</th>
+            <th>Land-cover class</th>
+            <th>Stable mean change (µg/m³)</th>
+            <th>Gain mean change (µg/m³)</th>
+            <th>Loss mean change (µg/m³)</th>
+            <th>Main pattern</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td>NO2</td>
+            <td>Built Area</td>
+            <td>-0.97</td>
+            <td>-1.08</td>
+            <td>-0.69</td>
+            <td>Overall decrease across built area transition zones, with localized increases.</td>
+          </tr>
+          <tr>
+            <td>PM10</td>
+            <td>Trees</td>
+            <td>-0.91</td>
+            <td>-0.63</td>
+            <td>-1.02</td>
+            <td>Overall decrease across tree transition zones, strongest in tree loss areas.</td>
+          </tr>
+          <tr>
+            <td>PM2.5</td>
+            <td>Crops</td>
+            <td>-0.04</td>
+            <td>-0.74</td>
+            <td>-0.79</td>
+            <td>Stable crop areas show smaller decrease than crop gain and crop loss zones.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="interpretation-box">
+        <p>
+          Across the three pollutants, the mean annual aggregation change is negative for all stable, gain, and loss transition zones.
+          This suggests a general decrease in pollutant concentration between 2021 and 2023 within the analyzed land-cover transition classes.
+          However, the presence of positive maximum values in the zonal statistics indicates that local increases still occurred in specific areas.
+          The results should therefore be interpreted as spatial associations between land-cover transitions and air quality change, rather than
+          direct causal relationships.
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Geographic Information Systems A.A. 2025/26 | Mapping Air Quality in Italy | Group 6</p>
+  </footer>
+</body>
+</html>

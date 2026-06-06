@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home | Mapping Air Quality in Italy</title>
+
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #1f2933;
+      background: #eef3f7;
+      line-height: 1.6;
+    }
+
+    header {
+      background: #ffffff;
+      padding: 18px 8%;
+      border-bottom: 1px solid #d9e2ec;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .logo {
+      font-weight: 700;
+      color: #12355b;
+      letter-spacing: 0.3px;
+    }
+
+    nav a {
+      margin-left: 22px;
+      color: #12355b;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    nav a:hover {
+      color: #0077b6;
+    }
+
+    main {
+      width: min(1500px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 36px 0 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.04fr);
+      gap: 0;
+      align-items: stretch;
+      margin-bottom: 34px;
+      filter: drop-shadow(0 16px 34px rgba(15, 40, 70, 0.13));
+    }
+
+    .hero-text {
+      background: linear-gradient(135deg, #12355b, #2f80a8);
+      color: #ffffff;
+      padding: clamp(44px, 5vw, 76px);
+      border-radius: 28px 0 0 28px;
+      min-height: 650px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-text h1 {
+      margin: 0 0 30px;
+      color: #ffffff;
+      font-size: clamp(3.6rem, 6.2vw, 6.7rem);
+      line-height: 0.98;
+      letter-spacing: -3px;
+      max-width: 760px;
+    }
+
+    .hero-text p {
+      margin: 0;
+      max-width: 760px;
+      color: #e9f3f8;
+      font-size: clamp(1.12rem, 1.4vw, 1.55rem);
+      line-height: 1.55;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      margin-top: 42px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 14px 28px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .button.primary {
+      background: #ffffff;
+      color: #0b2f57;
+      border-color: #ffffff;
+    }
+
+    .hero-map {
+      background: #ffffff;
+      border-radius: 0 28px 28px 0;
+      padding: 0;
+      min-height: 650px;
+      overflow: hidden;
+    }
+
+    .hero-map figure {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .hero-map img {
+      width: 100%;
+      height: 100%;
+      min-height: 650px;
+      object-fit: cover;
+      object-position: center;
+      display: block;
+      border: 0;
+      border-radius: 0 28px 28px 0;
+    }
+
+    .section-card {
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 32px;
+      margin-bottom: 28px;
+      border: 1px solid #e4edf3;
+      box-shadow: 0 6px 22px rgba(15, 40, 70, 0.08);
+    }
+
+    .section-label {
+      display: inline-block;
+      padding: 6px 14px;
+      margin-bottom: 14px;
+      border-radius: 999px;
+      background: #e7f2f8;
+      color: #1f5f7a;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    h2, h3 {
+      color: #102a43;
+    }
+
+    h2 {
+      margin: 0 0 18px;
+      font-size: 2rem;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      color: #1f3a5f;
+    }
+
+    .glance-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .glance-item,
+    .role-item,
+    .data-item {
+      background: #f7fafc;
+      border: 1px solid #d9e2ec;
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .glance-item strong,
+    .role-item strong,
+    .data-item strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #12355b;
+      font-size: 1.05rem;
+    }
+
+    .two-column {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .compact-list {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .compact-list li {
+      margin-bottom: 8px;
+    }
+
+    .data-grid,
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .workflow-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .workflow-strip span {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: #e7f2f8;
+      color: #12355b;
+      font-weight: 700;
+      border: 1px solid #c9ddea;
+    }
+
+    footer {
+      text-align: center;
+      padding: 24px;
+      background: #ffffff;
+      border-top: 1px solid #d9e2ec;
+      color: #52606d;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 1050px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-text {
+        border-radius: 28px 28px 0 0;
+        min-height: auto;
+      }
+
+      .hero-map {
+        border-radius: 0 0 28px 28px;
+        min-height: 420px;
+      }
+
+      .hero-map figure {
+        height: 100%;
+      }
+
+      .hero-map img {
+        min-height: 420px;
+        border-radius: 0 0 28px 28px;
+      }
+
+      .glance-grid,
+      .data-grid,
+      .role-grid,
+      .two-column {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      nav a {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+
+      main {
+        width: calc(100% - 24px);
+        padding-top: 24px;
+      }
+
+      .hero-text {
+        padding: 34px 24px;
+      }
+
+      .hero-text h1 {
+        font-size: 3rem;
+        letter-spacing: -1.5px;
+      }
+
+      .section-card {
+        padding: 24px 18px;
+      }
+
+      .glance-grid,
+      .data-grid,
+      .role-grid,
+      .two-column {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">GIS Lab 2025/26</div>
+
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="methods.html">Methods</a>
+      <a href="results.html">Results</a>
+      <a href="webgis.html">WebGIS</a>
+      <!-- <a href="https://y39541231-meng.github.io/gis-lab5-webgis/">WebGIS</a> -->
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Mapping Air Quality in Italy</h1>
+
+        <p>
+          This project analyzes air pollution change, land-cover transition, and
+          population exposure in Italy between 2021 and 2023 using GIS-based
+          processing and web visualization.
+        </p>
+
+        <div class="hero-actions">
+          <a class="button primary" href="methods.html">View Methods</a>
+          <a class="button" href="results.html">Explore Results</a>
+          <a class="button" href="webgis.html">Open WebGIS</a>
+        </div>
+      </div>
+
+      <div class="hero-map">
+        <figure>
+          <img src="images/home/Italy_display.png" alt="Italy case-study boundary displayed over a satellite basemap" />
+        </figure>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <span class="section-label">Project at a glance</span>
+      <h2>Overview</h2>
+
+      <div class="glance-grid">
+        <div class="glance-item">
+          <strong>Study area</strong>
+          Italy
+        </div>
+
+        <div class="glance-item">
+          <strong>Period</strong>
+          2021–2023
+        </div>
+
+        <div class="glance-item">
+          <strong>Main themes</strong>
+          Air quality, land-cover change, population exposure
+        </div>
+
+        <div class="glance-item">
+          <strong>Main outputs</strong>
+          Maps, tables, charts, bivariate maps, and WebGIS layers
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <span class="section-label">Project scope</span>
+      <h2>Objectives and data</h2>
+
+      <div class="two-column">
+        <div>
+          <h3>Research objectives</h3>
+          <ul class="compact-list">
+            <li>Analyze annual air pollutant changes between 2021 and 2023.</li>
+            <li>Detect land-cover transitions over the same period.</li>
+            <li>Compare pollutant change with assigned land-cover transition zones.</li>
+            <li>Assess 2023 population exposure to pollutant concentration classes.</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3>Data sources</h3>
+          <ul class="compact-list">
+            <li>CAMS European Air Quality Reanalysis for NO2, PM2.5, and PM10.</li>
+            <li>ESRI 10m Annual Land Cover for 2021 and 2023.</li>
+            <li>WorldPop 2023 population count data.</li>
+            <li>Case-study and administrative boundary layers.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <span class="section-label">Workflow preview</span>
+      <h2>Processing workflow</h2>
+
+      <p>
+        The full methodology is described in the Methods page. The workflow follows the
+        laboratory sequence from pollutant preprocessing to land-cover transition analysis,
+        population exposure assessment, and final web visualization.
+      </p>
+
+      <div class="workflow-strip" aria-label="Project workflow preview">
+        <span>Pollutant maps</span>
+        <span>Annual averages</span>
+        <span>Concentration classes</span>
+        <span>Pollutant change map</span>
+        <span>Land-cover change</span>
+        <span>Zonal statistics</span>
+        <span>Bivariate maps</span>
+        <span>Population exposure</span>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <span class="section-label">Team contributions</span>
+      <h2>Group work division</h2>
+
+      <div class="role-grid">
+        <div class="role-item">
+          <strong>Student A: Mengyuan Lei</strong>
+          NO2 and Built Area analysis, WebGIS map implementation, and map controls / layer display.
+        </div>
+
+        <div class="role-item">
+          <strong>Student B: Mengzhen Han</strong>
+          PM10 and Trees analysis, Results page, statistical charts, and main result interpretation.
+        </div>
+
+        <div class="role-item">
+          <strong>Student C: Yueling Tian</strong>
+          PM2.5 and Crops analysis, Home and Methods pages, and final results summary.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Geographic Information Systems A.A. 2025/26 | Mapping Air Quality in Italy | Group 6
+  </footer>
+</body>
+</html>
